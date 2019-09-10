@@ -1,0 +1,34 @@
+
+--- 
+server.port: ${PORT:8080} # get the server port from (CF) environment if present. Otherwise fallback to 8080.
+
+spring:
+  # Data Source configurations. Change this to the values of your created HANA service instance.
+  datasource:
+    url:             "jdbc:sap://localhost:9999?encrypt=true&validateCertificate=false&currentschema=8ED7C7662EA04BB9B01477B90C323C24"
+    username:        "8ED7C7662EA04BB9B01477B90C323C24_ATPYGBY1NDF274PNZ1X19TXRK_RT"
+    password:        "Dl9fhLcNaDt6oA4rAkxkDNo7VMx7UMfR0w3ts7PiOqjHdflBPb37GV3ZFJ1GV90EZPyfAVgOKgeLxExn.UgaccRpUx9qSIHYEZoZ8_f03msilxfccEy2GuXlBwFAw-DT"
+    driverClassName: "com.sap.db.jdbc.Driver"
+    type:            "com.zaxxer.hikari.HikariDataSource"
+    hikari:
+      maximumPoolSize: 1
+
+  # Remote Setup: configurations of the XSUAA authorization server endpoints on SAP CP CF.
+  # security:
+  #   oauth2:
+  #     resourceserver:
+  #       jwt:
+  #         jwk-set-uri: https://authentication.eu10.hana.ondemand.com/token_keys
+---
+# Cloud Foundry Specific Overrides.
+spring:
+  profiles: cloud    # to activate the profile the 'spring.profiles.active' environment property needs to be set. See manifest.yml.
+  datasource:        # read the data source connection properties from VCAP_SERVICES. See manifest.yml for declaration of 'db_service_instance_name'.
+    url:             ${vcap.services.${db_service_instance_name}.credentials.url}
+    username:        ${vcap.services.${db_service_instance_name}.credentials.user}
+    password:        ${vcap.services.${db_service_instance_name}.credentials.password}
+    driverClassName: ${vcap.services.${db_service_instance_name}.credentials.driver}
+    type:            com.zaxxer.hikari.HikariDataSource
+    hikari:
+      maximumPoolSize: 10  
+
